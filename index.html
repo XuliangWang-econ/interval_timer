@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>跳绳间隔计时器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  
+  <!-- iOS Safari PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="跳绳计时">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="theme-idle">
+
+  <!-- Global Progress Bar at very top of screen -->
+  <div id="progress-bar-container">
+    <div id="progress-bar-fill"></div>
+  </div>
+
+  <div id="app-container">
+    
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="preset-title-wrap">
+        <span class="preset-title-label">当前方案</span>
+        <span id="current-preset-name" class="preset-name">跳绳强化 (25.5m)</span>
+      </div>
+      <div class="top-bar-actions">
+        <!-- Audio Mute Button -->
+        <button id="btn-toggle-sound" class="icon-btn" aria-label="切换声音" title="切换静音">
+          <svg id="icon-sound-on" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <svg id="icon-sound-off" viewBox="0 0 24 24" style="display: none;">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27l4.73 4.73H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        </button>
+
+        <!-- Settings Drawer Toggle Button -->
+        <button id="btn-open-settings" class="icon-btn" aria-label="配置方案" title="方案设置">
+          <svg viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Central Hero Display (Tap to Pause/Resume) -->
+    <main id="hero-display" class="hero-display">
+      <div id="phase-badge" class="phase-capsule">就绪</div>
+      <div id="countdown-text" class="countdown-timer">00:10</div>
+      <div class="badges-row">
+        <span id="set-badge" class="badge">SET 1 / 8</span>
+        <span id="round-badge" class="badge">ROUND 1 / 3</span>
+      </div>
+    </main>
+
+    <!-- Bottom Controls Area -->
+    <footer class="bottom-controls">
+      <!-- Cumulative metrics -->
+      <div class="metrics-summary">
+        <div class="metric-item">
+          <span class="metric-label">实际跳绳做功</span>
+          <span id="metric-work-elapsed" class="metric-value">00:00</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">总剩余时间</span>
+          <span id="metric-total-remaining" class="metric-value">25:40</span>
+        </div>
+      </div>
+
+      <!-- Control Buttons -->
+      <div class="control-buttons-row">
+        <!-- Prev set -->
+        <button id="btn-prev-set" class="secondary-btn" aria-label="上一组" title="上一组">
+          <svg viewBox="0 0 24 24">
+            <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+          </svg>
+        </button>
+
+        <!-- Main Play/Pause Button -->
+        <button id="btn-play-pause" class="main-play-btn" aria-label="开始或暂停">
+          <svg id="icon-play" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="icon-pause" viewBox="0 0 24 24" style="display: none;">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </button>
+
+        <!-- Reset Button -->
+        <button id="btn-reset" class="secondary-btn" aria-label="重置训练" title="重置">
+          <svg viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+
+        <!-- Skip set -->
+        <button id="btn-skip-next" class="secondary-btn" aria-label="下一组" title="下一组">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+          </svg>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Settings & Preset Drawer Backdrop -->
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+  <!-- Slide-Up Settings Drawer -->
+  <aside id="settings-drawer" class="settings-drawer" aria-label="设置抽屉">
+    <div class="drawer-header">
+      <h2>训练方案配置</h2>
+      <button id="btn-close-settings" class="drawer-close-btn" aria-label="关闭">&times;</button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Preset Selection -->
+      <div class="preset-selector-group">
+        <label for="select-preset" style="font-size: 13px; color: #9CA3AF;">选择预设</label>
+        <select id="select-preset" class="preset-select-control"></select>
+      </div>
+
+      <div class="preset-mgmt-row">
+        <button id="btn-new-preset" class="btn-secondary">新建方案</button>
+        <button id="btn-save-preset" class="btn-secondary primary">保存方案</button>
+        <button id="btn-del-preset" class="btn-secondary danger">删除方案</button>
+      </div>
+
+      <div class="preset-selector-group">
+        <label for="input-preset-name" style="font-size: 13px; color: #9CA3AF;">方案名称</label>
+        <input id="input-preset-name" class="preset-select-control" type="text" value="跳绳强化 (25.5m)">
+      </div>
+
+      <!-- Parameters Stepper Cards -->
+      <div class="params-grid">
+        <!-- Prepare Time -->
+        <div class="param-card">
+          <span class="param-label">准备时间 (秒)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="prepareTime" data-step="-5">-5</button>
+            <input id="input-prepareTime" class="param-input" type="number" value="10" min="0" max="600">
+            <button class="param-step-btn" data-field="prepareTime" data-step="5">+5</button>
+          </div>
+        </div>
+
+        <!-- Work Time -->
+        <div class="param-card">
+          <span class="param-label">单组跳绳 (秒)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="workTime" data-step="-5">-5</button>
+            <input id="input-workTime" class="param-input" type="number" value="45" min="5" max="3600">
+            <button class="param-step-btn" data-field="workTime" data-step="5">+5</button>
+          </div>
+        </div>
+
+        <!-- Rest Time -->
+        <div class="param-card">
+          <span class="param-label">组间休息 (秒)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="restTime" data-step="-5">-5</button>
+            <input id="input-restTime" class="param-input" type="number" value="15" min="0" max="600">
+            <button class="param-step-btn" data-field="restTime" data-step="5">+5</button>
+          </div>
+        </div>
+
+        <!-- Exercises (Sets per round) -->
+        <div class="param-card">
+          <span class="param-label">单轮组数 (组)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="exercises" data-step="-1">-1</button>
+            <input id="input-exercises" class="param-input" type="number" value="8" min="1" max="100">
+            <button class="param-step-btn" data-field="exercises" data-step="1">+1</button>
+          </div>
+        </div>
+
+        <!-- Rounds -->
+        <div class="param-card">
+          <span class="param-label">总大轮数 (轮)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="rounds" data-step="-1">-1</button>
+            <input id="input-rounds" class="param-input" type="number" value="3" min="1" max="50">
+            <button class="param-step-btn" data-field="rounds" data-step="1">+1</button>
+          </div>
+        </div>
+
+        <!-- Round Rest Time -->
+        <div class="param-card">
+          <span class="param-label">大轮间歇 (秒)</span>
+          <div class="param-control-row">
+            <button class="param-step-btn" data-field="roundRestTime" data-step="-5">-5</button>
+            <input id="input-roundRestTime" class="param-input" type="number" value="45" min="0" max="1200">
+            <button class="param-step-btn" data-field="roundRestTime" data-step="5">+5</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time calculation summary -->
+      <div id="drawer-summary-badge" class="preset-summary-badge">
+        预计总用时: 25分40秒<br>累计跳绳做功: 18分00秒 (共 24 组)
+      </div>
+    </div>
+  </aside>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
