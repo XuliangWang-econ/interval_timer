@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="ropeGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+    <linearGradient id="glowGrad512" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad512)"/>
+  <rect x="4" y="4" width="504" height="504" rx="108" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4"/>
+
+  <!-- Outer Timer Ring -->
+  <circle cx="256" cy="268" r="170" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="20"/>
+  <circle cx="256" cy="268" r="170" fill="none" stroke="url(#ropeGrad512)" stroke-width="20" stroke-dasharray="850" stroke-dashoffset="210" stroke-linecap="round"/>
+
+  <!-- Stopwatch Top Button -->
+  <rect x="236" y="58" width="40" height="26" rx="8" fill="#9CA3AF"/>
+  <rect x="246" y="84" width="20" height="16" fill="#6B7280"/>
+
+  <!-- Jump Rope Arc Dynamic Graphic -->
+  <path d="M134 220 C174 386, 338 386, 378 220" fill="none" stroke="url(#glowGrad512)" stroke-width="16" stroke-linecap="round"/>
+  
+  <!-- Rope Handles -->
+  <rect x="112" y="178" width="32" height="64" rx="10" transform="rotate(-25 128 210)" fill="#F3F4F6"/>
+  <rect x="368" y="178" width="32" height="64" rx="10" transform="rotate(25 384 210)" fill="#F3F4F6"/>
+
+  <!-- Center Stopwatch Pulse Icon -->
+  <polygon points="240,236 240,300 292,268" fill="#FFFFFF"/>
+</svg>
